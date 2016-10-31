@@ -1137,10 +1137,10 @@ public class Server implements HsqlSocketRequestHandler, Notified {
      */
     public void setSilent(boolean silent) {
 
-        printWithThread("setSilent(" + silent + ")");
         serverProperties.setProperty(ServerProperties.sc_key_silent, silent);
-
         isSilent = silent;
+
+        printWithThread("setSilent(" + silent + ")");
     }
 
     /**
@@ -1222,9 +1222,6 @@ public class Server implements HsqlSocketRequestHandler, Notified {
      */
     public void setProperties(HsqlProperties props)
     throws IOException, ServerAcl.AclFormatException {
-
-        checkRunning(false);
-
         if (props != null) {
             props.validate();
 
@@ -1244,10 +1241,14 @@ public class Server implements HsqlSocketRequestHandler, Notified {
 
         isSilent =
             serverProperties.isPropertyTrue(ServerProperties.sc_key_silent);
+
         isRemoteOpen = serverProperties.isPropertyTrue(
             ServerProperties.sc_key_remote_open_db);
         isDaemon =
             serverProperties.isPropertyTrue(ServerProperties.sc_key_daemon);
+
+        // after assigning isSilent variable to ensure no output on stdout if silent mode is enabled
+        checkRunning(false);
 
         String aclFilepath =
             serverProperties.getProperty(ServerProperties.sc_key_acl);
